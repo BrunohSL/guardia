@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: guardia-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=guardia
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  webhook-api:
+    build: .
+    container_name: webhook-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=guardia
+      - DB_USER=root
+      - DB_PASSWORD=root
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
