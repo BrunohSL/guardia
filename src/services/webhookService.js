@@ -1,41 +1,102 @@
-const axios = require('axios');
+const https = require('https');
+const http = require('http');
+const { URL } = require('url');
 const { n8nWebhookUrl } = require('../config/env');
 
-// Serviço responsável pela lógica de negócio do webhook
 class WebhookService {
-  async processAndForward(data) {
+  formatWebhookData(body, query) {
+    const contacts = Array.isArray(body) ? body : [];
+
+    const formatted = {
+      ocurrence_id: query.ocorrencia || '',
+      endereco: decodeURIComponent(query.endereco || ''),
+      cuc: 'TST',
+      descricao: 'Teste',
+      tipo_evento: 'Teste tipo evento',
+      contact_id: 'HE60'
+    };
+
+    // Adiciona até 3 contatos
+    contacts.forEach((contact, index) => {
+      const num = index + 1;
+      if (num <= 3) {
+        formatted[`nome${num}`] = contact.name || '';
+        formatted[`telefone${num}`] = contact.phone01 || '';
+      }
+    });
+
+    return formatted;
+  }
+
+  async processAndForward(body, query) {
     if (!n8nWebhookUrl) {
       throw new Error('N8N_WEBHOOK_URL não configurada');
     }
 
-    console.log('Dados recebidos:', JSON.stringify(data, null, 2));
-    console.log('URL do webhook:', n8nWebhookUrl);
+    const data = this.formatWebhookData(body, query);
+    console.log('Dados formatados para N8N:', JSON.stringify(data, null, 2));
 
-    try {
-      const response = await axios.post(n8nWebhookUrl, data, {
+    return new Promise((resolve, reject) => {
+      const url = new URL(n8nWebhookUrl);
+      const postData = JSON.stringify(data);
+
+      const options = {
+        hostname: url.hostname,
+        port: url.port || (url.protocol === 'https:' ? 443 : 80),
+        path: url.pathname + url.search,
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
         },
         timeout: 60000
-      });
-
-      console.log('Dados enviados para N8N com sucesso');
-
-      return {
-        success: true,
-        n8nResponse: response.data,
-        statusCode: response.status
       };
-    } catch (error) {
-      console.error('Erro ao enviar para N8N:', error.message);
-      console.error('Detalhes do erro:', {
-        message: error.message,
-        code: error.code,
-        response: error.response?.data,
-        status: error.response?.status
+
+      const protocol = url.protocol === 'https:' ? https : http;
+      const req = protocol.request(options, (res) => {
+        let responseData = '';
+        res.on('data', (chunk) => responseData += chunk);
+        res.on('end', () => {
+          console.log('=== RESPOSTA DO N8N ===');
+          console.log('Status:', res.statusCode);
+          console.log('Headers:', JSON.stringify(res.headers, null, 2));
+          console.log('Body:', responseData);
+          console.log('=======================');
+
+          resolve({
+            success: true,
+            n8nResponse: responseData,
+            statusCode: res.statusCode
+          });
+        });
       });
-      throw new Error(`Falha ao enviar para N8N: ${error.message}`);
-    }
+
+      req.on('error', (error) => {
+        reject(new Error(`Falha ao enviar para N8N: ${error.message}`));
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error('Timeout ao enviar para N8N'));
+      });
+
+      req.write(postData);
+      req.end();
+    });
+  }
+
+  async receiveFromN8N(data) {
+    console.log('=== RESPOSTA DO N8N RECEBIDA ===');
+    console.log('Dados:', JSON.stringify(data, null, 2));
+    console.log('================================');
+
+    // Aqui você vai implementar a lógica de atualizar a ocorrência
+    // e chamar o endpoint de close do sigma
+
+    return {
+      success: true,
+      message: 'Dados recebidos do N8N com sucesso'
+    };
   }
 }
 

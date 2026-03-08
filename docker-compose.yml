@@ -4,8 +4,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: guardia-mysql
-    ports:
-      - "3306:3306"
+    network_mode: "host"
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=guardia
@@ -21,12 +20,11 @@ services:
   webhook-api:
     build: .
     container_name: webhook-api
-    ports:
-      - "3000:3000"
+    network_mode: "host"
     environment:
       - PORT=3000
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
-      - DB_HOST=mysql
+      - DB_HOST=localhost
       - DB_PORT=3306
       - DB_NAME=guardia
       - DB_USER=root
