@@ -1,10 +1,10 @@
-const eventoService = require('../services/eventoService');
+const eventService = require('../services/eventService');
 
-class EventoController {
+class EventController {
   async create(req, res) {
     try {
-      const evento = await eventoService.create(req.body);
-      res.status(201).json(evento);
+      const event = await eventService.create(req.body);
+      res.status(201).json(event);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -12,8 +12,8 @@ class EventoController {
 
   async findAll(req, res) {
     try {
-      const eventos = await eventoService.findAll();
-      res.json(eventos);
+      const events = await eventService.findAll();
+      res.json(events);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -21,8 +21,8 @@ class EventoController {
 
   async findById(req, res) {
     try {
-      const evento = await eventoService.findById(req.params.id);
-      res.json(evento);
+      const event = await eventService.findById(req.params.id);
+      res.json(event);
     } catch (error) {
       res.status(404).json({ error: error.message });
     }
@@ -30,8 +30,8 @@ class EventoController {
 
   async update(req, res) {
     try {
-      const evento = await eventoService.update(req.body.id, req.body);
-      res.json(evento);
+      const event = await eventService.update(req.body.id, req.body);
+      res.json(event);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -39,7 +39,7 @@ class EventoController {
 
   async delete(req, res) {
     try {
-      const result = await eventoService.delete(req.body.id);
+      const result = await eventService.delete(req.body.id);
       res.json(result);
     } catch (error) {
       res.status(404).json({ error: error.message });
@@ -47,4 +47,4 @@ class EventoController {
   }
 }
 
-module.exports = new EventoController();
+module.exports = new EventController();

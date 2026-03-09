@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 
-const Integracao = sequelize.define('Integracao', {
+const Integration = sequelize.define('Integration', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -16,10 +16,10 @@ const Integracao = sequelize.define('Integracao', {
     allowNull: false
   }
 }, {
-  tableName: 'integracoes',
+  tableName: 'integrations',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });
 
-module.exports = Integracao;
+module.exports = Integration;

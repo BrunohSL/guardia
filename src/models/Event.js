@@ -1,28 +1,38 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 
-const Evento = sequelize.define('Evento', {
+const Event = sequelize.define('Event', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  codigo_evento: {
+  integration_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'integrations',
+      key: 'id'
+    }
+  },
+  event_contact_id: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true
   },
-  nome: {
+  cuc: {
     type: DataTypes.STRING
   },
-  descricao: {
+  name: {
+    type: DataTypes.STRING
+  },
+  event_type: {
     type: DataTypes.TEXT
   }
 }, {
-  tableName: 'eventos',
+  tableName: 'events',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });
 
-module.exports = Evento;
+module.exports = Event;

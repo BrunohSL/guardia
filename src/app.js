@@ -2,8 +2,8 @@ const express = require('express');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const webhookRoutes = require('./routes/webhookRoutes');
-const integracaoRoutes = require('./routes/integracaoRoutes');
-const eventoRoutes = require('./routes/eventoRoutes');
+const integrationRoutes = require('./routes/integrationRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 const app = express();
 
@@ -30,8 +30,8 @@ app.get('/health', (req, res) => {
 
 // Rotas da aplicação
 app.use('/', webhookRoutes);
-app.use('/api', integracaoRoutes);
-app.use('/api', eventoRoutes);
+app.use('/api', integrationRoutes);
+app.use('/api', eventRoutes);
 
 // Middleware de tratamento de erros (deve ser o último)
 app.use(errorHandler);

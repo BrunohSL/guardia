@@ -52,24 +52,24 @@ class WebhookService {
         timeout: 60000
       };
 
-      const protocol = url.protocol === 'https:' ? https : http;
-      const req = protocol.request(options, (res) => {
-        let responseData = '';
-        res.on('data', (chunk) => responseData += chunk);
-        res.on('end', () => {
-          console.log('=== RESPOSTA DO N8N ===');
-          console.log('Status:', res.statusCode);
-          console.log('Headers:', JSON.stringify(res.headers, null, 2));
-          console.log('Body:', responseData);
-          console.log('=======================');
+      // const protocol = url.protocol === 'https:' ? https : http;
+      // const req = protocol.request(options, (res) => {
+      //   let responseData = '';
+      //   res.on('data', (chunk) => responseData += chunk);
+      //   res.on('end', () => {
+      //     console.log('=== RESPOSTA DO N8N ===');
+      //     console.log('Status:', res.statusCode);
+      //     console.log('Headers:', JSON.stringify(res.headers, null, 2));
+      //     console.log('Body:', responseData);
+      //     console.log('=======================');
 
-          resolve({
-            success: true,
-            n8nResponse: responseData,
-            statusCode: res.statusCode
-          });
-        });
-      });
+      //     resolve({
+      //       success: true,
+      //       n8nResponse: responseData,
+      //       statusCode: res.statusCode
+      //     });
+      //   });
+      // });
 
       req.on('error', (error) => {
         reject(new Error(`Falha ao enviar para N8N: ${error.message}`));
