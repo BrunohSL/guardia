@@ -1,4 +1,5 @@
 const Event = require('../models/Event');
+const Integration = require('../models/Integration');
 
 class EventService {
   async create(data) {
@@ -6,6 +7,16 @@ class EventService {
 
     if (!event_contact_id) {
       throw new Error('Código do evento é obrigatório');
+    }
+
+    if (!integration_id) {
+      throw new Error('ID da integração é obrigatório');
+    }
+
+    // Verifica se a integração existe
+    const integration = await Integration.findByPk(integration_id);
+    if (!integration) {
+      throw new Error('Integração não encontrada');
     }
 
     const event = await Event.create({ event_contact_id, integration_id, cuc, name, event_type });

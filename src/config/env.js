@@ -9,5 +9,10 @@ module.exports = {
     name: process.env.DB_NAME || 'guardia',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || 'root'
+  },
+  sigma: {
+    baseUrl: process.env.SIGMA_BASE_URL || 'https://beta.segware.io/server/api/v1',
+    companyId: process.env.SIGMA_COMPANY_ID || '280',
+    bearerToken: process.env.SIGMA_BEARER_TOKEN
   }
 };
